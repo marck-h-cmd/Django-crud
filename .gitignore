@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+
 *$py.class
 
 # Django specific
@@ -16,6 +17,4 @@ env/
 .vscode/
 .idea/
 
-# Migrations (optional)
-**/migrations/*.py
-!**/migrations/__init__.py
+
