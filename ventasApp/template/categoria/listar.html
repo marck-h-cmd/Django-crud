@@ -1,5 +1,5 @@
 {% extends "plantilla.html" %}
-{% block content %}
+{% block contenido %}
 <div class="container">
     <div class="card card-outline card-info mt-3">
         <div class="card-header">
@@ -40,12 +40,12 @@
                     {% if categoria %}
                     {% for itemcategoria in categoria %}
                     <tr>
-                        <td>{{ itemcategoria.id }}</td>
+                        <td>{{ itemcategoria.idcategoria }}</td>
                         <td>{{ itemcategoria.descripcion }}</td>
                         <td style="text-align: center;">
-                            <a href="" class="btn btn-info btnsm"><i class="fa
+                            <a href="{% url 'editarcategoria' itemcategoria.idcategoria %}" class="btn btn-info btnsm"><i class="fa
 fa-edit"></i> Editar</a>
-                            <a href="" class="btn btn-danger btnsm"><i class="fa fa-trash"></i>
+                            <a href="{% url 'eliminarcategoria' itemcategoria.idcategoria %}" class="btn btn-danger btnsm"><i class="fa fa-trash"></i>
                                 Eliminar</a>
                         </td>
                     </tr>
