@@ -1,0 +1,65 @@
+{% extends "plantilla.html" %}
+{% block contenido %}
+<div class="container">
+    <div class="card card-outline card-info mt-3">
+        <div class="card-header">
+            <h1 class="card-title">LISTADO DE CLIENTES</h1>
+            <a href="{% url 'crear_cliente' %}" class="btn btn-sm btn-primary btnadd">
+                <i class="fas fa-plus"></i> NUEVO
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <form method="GET">
+                        <div class="input-group">
+                            <input type="text" name="buscar" class="form-control" placeholder="Buscar" autofocus>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <table class="table table-striped mt-4" style="width:100%">
+                <thead class="bg-info text-white">
+                    <tr>
+                        <th>ID</th>
+                        <th>APELLIDO</th>
+                        <th>NOMBRE</th>
+                        <th>DIRECCIÓN</th>
+                        <th>SEXO</th>
+                        <th><center>OPCIONES</center></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if clientes %}
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.idcliente }}</td> 
+                        <td>{{ cliente.apellido }}</td>
+                        <td>{{ cliente.nombre }}</td>
+                        <td>{{ cliente.direccion }}</td>
+                        <td>{{ cliente.get_sexo_display }}</td>
+                        <td style="text-align: center;">
+                            <a href="{% url 'actualizar_cliente' cliente.idcliente %}" class="btn btn-info btn-sm">
+                                <i class="fa fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'eliminar_cliente' cliente.idcliente %}" class="btn btn-danger btn-sm">
+                                <i class="fa fa-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr style="text-align: center;">
+                        <td colspan="6">No hay Registros</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
