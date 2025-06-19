@@ -15,3 +15,11 @@ class Producto(models.Model):
         precio=models.FloatField()
         stock=models.IntegerField() 
         estado=models.BooleanField(default=True)  
+
+class Cliente(models.Model):
+    idcliente = models.AutoField(primary_key=True)
+    apellido = models.CharField(max_length=80)
+    nombre = models.CharField(max_length=80)
+    direccion = models.CharField(max_length=100)
+    sexo = models.CharField(max_length=1, choices=[('M', 'Masculino'), ('F', 'Femenino')])
+    estado = models.BooleanField(default=True)

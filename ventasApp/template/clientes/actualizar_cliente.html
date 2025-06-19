@@ -1,0 +1,23 @@
+{% extends "plantilla.html" %}
+{% block contenido %}
+{% load crispy_forms_tags %}
+<div class="container">
+    <div class="card card-outline card-primary mt-3">
+        <div class="card-header">
+            <h3 class="card-title">
+                {% if form.instance.pk %}EDITAR CLIENTE{% else %}NUEVO CLIENTE{% endif %}
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+                <a href="{% url 'listar_clientes' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
