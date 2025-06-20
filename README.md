@@ -1,28 +1,4 @@
-# 🐍 Django Project Setup Guide
 
-Este proyecto está desarrollado con Django y requiere instalar sus dependencias, aplicar migraciones y luego ejecutar el servidor de desarrollo. Sigue estos pasos para correrlo correctamente.
-
-## ✅ Requisitos previos
-
-Asegúrate de tener instalado:
-
-- Python 3.8+
-- pip
-- virtualenv (opcional pero recomendado)
-- PostgreSQL o SQLite (según la configuración del proyecto)
-
-## 🚀 Instalación y ejecución
-
-### 1. Instala las dependencias
-
-```bash
-pip install -r requirements.txt
-Claro, aquí tienes el `README.md` actualizado sin los puntos 1, 2, 4 ni la sección de tests:
-
-````markdown
-# 🐍 Django Project Setup Guide
-
-Este proyecto está desarrollado con Django y requiere instalar sus dependencias, aplicar migraciones y luego ejecutar el servidor de desarrollo. Sigue estos pasos para correrlo correctamente.
 
 ## ✅ Requisitos previos
 
