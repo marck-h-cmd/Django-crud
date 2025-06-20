@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages 
-
+from django.db.models import Count
+from ventasApp.views import Categoria,Producto,Cliente
 def acceder(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -24,7 +25,18 @@ def acceder(request):
         return render(request, "login.html", {"form": form})
     
 def homePage(request):
-    context={}
+    total_productos = Producto.objects.filter(estado=True).count()
+    total_categorias = Categoria.objects.filter(estado=True).count()
+    total_clientes = Cliente.objects.filter(estado=True).count()
+    productos_sin_stock = Producto.objects.filter(stock=0, estado=True).count()
+    
+    
+    context = {
+        'total_productos': total_productos,
+        'total_categorias': total_categorias,
+        'total_clientes': total_clientes,
+        'productos_sin_stock': productos_sin_stock,
+    }
     return render(request,"bienvenido.html",context) 
 
 
