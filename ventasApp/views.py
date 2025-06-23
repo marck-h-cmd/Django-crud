@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from ventasApp.models import Categoria , Producto, Cliente
 from django.db.models import Q 
+from django.contrib import messages
 from .forms import CategoriaForm,ProductoForm, ClienteForm
 # Create your views here.
 def listarcategoria(request):
@@ -15,7 +16,8 @@ def agregarcategoria(request):
     if request.method=="POST":
         form=CategoriaForm(request.POST)
         if form.is_valid():
-            form.save() 
+            form.save()
+            messages.success(request, '¡Categoría creada exitosamente!') 
             return redirect("listarcategoria") 
     else:
         form=CategoriaForm()
@@ -29,6 +31,7 @@ def editarcategoria(request,id):
         form=CategoriaForm(request.POST,instance=categoria)
         if form.is_valid():
             form.save() 
+            messages.success(request, '¡Categoría actualizada exitosamente!')
             return redirect("listarcategoria") 
     else:
         form=CategoriaForm(instance=categoria)
@@ -39,6 +42,7 @@ def eliminarcategoria(request,id):
  categoria=Categoria.objects.get(idcategoria=id) 
  categoria.estado=False
  categoria.save()
+ messages.success(request, '¡Categoría eliminada exitosamente!')
  return redirect("listarcategoria") 
 
 
@@ -55,6 +59,7 @@ def agregarproducto(request):
         form=ProductoForm(request.POST)
         if form.is_valid():
             form.save() 
+            messages.success(request, '¡Producto creado exitosamente!') 
             return redirect("listarproducto") 
     else:
         form=ProductoForm()
@@ -68,6 +73,7 @@ def editarproducto(request,id):
         form=ProductoForm(request.POST,instance=producto)
         if form.is_valid():
             form.save() 
+            messages.success(request, '¡Producto actualizado exitosamente!')
             return redirect("listarproducto") 
     else:
         form=ProductoForm(instance=producto)
@@ -78,6 +84,7 @@ def eliminarproducto(request,id):
     producto=Producto.objects.get(idproducto=id) 
     producto.estado=False
     producto.save()
+    messages.success(request, '¡Producto eliminado exitosamente!')
     return redirect("listarproducto") 
 
 def crear_cliente(request):
@@ -85,6 +92,7 @@ def crear_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, '¡Cliente creado exitosamente!') 
             return redirect('listar_clientes')
     else:
         form = ClienteForm()
@@ -100,6 +108,7 @@ def actualizar_cliente(request, id):
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
+            messages.success(request, '¡Cliente actualizado exitosamente!')
             return redirect('listar_clientes')
     else:
         form = ClienteForm(instance=cliente)
@@ -110,5 +119,6 @@ def eliminar_cliente(request, id):
     if request.method == 'POST':
         cliente.estado = False
         cliente.save()
+        messages.success(request, '¡Cliente eliminado exitosamente!')
         return redirect('listar_clientes')
     return render(request, 'clientes/eliminar_cliente.html', {'cliente': cliente})

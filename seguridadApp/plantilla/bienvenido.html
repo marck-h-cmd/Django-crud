@@ -13,12 +13,7 @@
             </h1>
             <p class="lead mb-0 opacity-75">Panel de control y gestión empresarial</p>
         </div>
-        <div class="d-none d-md-block">
-            <button type="button" class="btn btn-light btn-lg shadow">
-                <i class="bi bi-download me-2"></i>
-                Exportar
-            </button>
-        </div>
+        
     </div>
 </div>
 
@@ -75,22 +70,7 @@
         </div>
     </div>
     
-    <div class="col-xl-3 col-md-6">
-        <div class="card border-0 shadow-lg h-100 bg-info text-white">
-            <div class="card-body text-center p-4">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    <div class="bg-white bg-opacity-25 rounded-circle p-3">
-                        <i class="bi bi-exclamation-triangle display-4 text-white"></i>
-                    </div>
-                </div>
-                <h2 class="display-4 fw-bold mb-2">{{ productos_sin_stock|default:0 }}</h2>
-                <h6 class="text-uppercase fw-semibold mb-3 opacity-75">Sin Stock</h6>
-                <a href="{% url 'listarproducto' %}" class="btn btn-dark btn-sm rounded-pill px-4 fw-semibold">
-                    <i class="bi bi-eye me-2"></i>Revisar
-                </a>
-            </div>
-        </div>
-    </div>
+   
 </div>
 
 <!-- Sección de acceso rápido más elegante -->

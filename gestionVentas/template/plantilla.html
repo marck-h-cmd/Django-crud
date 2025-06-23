@@ -17,6 +17,7 @@
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- AdminLTE CDN (temporal) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
 </head>
 
@@ -32,9 +33,6 @@
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="{% url 'home' %}" class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
                 </li>
                 <li class="nav-item">
                     <form action="{% url 'logout' %}" method="POST">
@@ -67,7 +65,7 @@
                             alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">User</a>
+                        <a href="#" class="d-block">Admin</a>
                     </div>
                 </div>
 
