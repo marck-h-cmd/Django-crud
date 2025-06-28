@@ -1,0 +1,182 @@
+{% extends 'plantilla.html' %}
+
+{% block titulo %}Listado de Ventas{% endblock %}
+
+{% block contenido %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Ventas</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <br>
+        <a href="{% url 'crear_venta' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Registro
+        </a>
+
+        <nav class="navbar navbar-light float-right">
+            <form class="form-inline my-2 my-lg-0" method="GET">
+                <input name="buscarpor" class="form-control mr-sm-2" type="search"
+                    placeholder="Busqueda por descripcion" aria-label="Search" value="{{ buscarpor }}">
+                <button class="btn btn-success my-2 my-sm-0" type="submit">Buscar</button>
+            </form>
+        </nav>
+
+
+        <div id="django-messages" style="display:none;">
+            {% for message in messages %}
+            <div data-type="{{ message.tags }}" data-message="{{ message|escapejs }}"></div>
+            {% endfor %}
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Codigo</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">RUC/DNI</th>
+                    <th scope="col">Nombres/Razon</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if page_obj.object_list.count <= 0 %} <tr>
+                    <td colspan="8">No hay registros</td>
+                    </tr>
+                    {% else %}
+                    {% for venta in page_obj.object_list %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ venta.idventa }}</td>
+                        <td>{{ venta.tipo.descripcion }}</td>
+                        <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
+                        <td>{{ venta.cliente.ruc_dni }}</td>
+                        <td>{{ venta.cliente.nomcliente }}</td>
+                        <td>S/ {{ venta.total|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'editar_venta' venta.idventa %}" class="btn btn-info btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{% url 'eliminar_venta' venta.idventa %}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if buscarpor %}&buscarpor={{ buscarpor }}{% endif %}">&laquo; first</a>
+                <a
+                    href="?page={{ page_obj.previous_page_number }}{% if buscarpor %}&buscarpor={{ buscarpor }}{% endif %}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if buscarpor %}&buscarpor={{ buscarpor }}{% endif %}">next</a>
+                <a
+                    href="?page={{ page_obj.paginator.num_pages }}{% if buscarpor %}&buscarpor={{ buscarpor }}{% endif %}">last
+                    &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <!-- /.card-body -->
+
+    <div class="card-footer">
+        <!-- Footer content if needed -->
+    </div>
+</div>
+<!-- /.card -->
+{% endblock %}
+
+{% block js %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Función para mostrar alertas con ícono de éxito
+    function mostrarAlerta(icono, titulo, texto = '') {
+        Swal.fire({
+            position: 'top-end',
+            icon: icono,
+            title: titulo,
+            text: texto,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            timerProgressBar: false,
+            toast: true,
+            timer: 5000
+        });
+    }
+
+    // Función para confirmar eliminación
+    function confirmarEliminacion(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Confirmar Eliminación',
+            html: `<p>¿Estás seguro que deseas eliminar este producto?</p>
+               <p class="text-danger"><small>Esta acción no se puede deshacer</small></p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '<i class="fa fa-trash"></i> Sí, eliminar',
+            cancelButtonText: '<i class="fa fa-times"></i> Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mostrar loader mientras se procesa
+                Swal.fire({
+                    title: 'Eliminando producto...',
+                    html: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        // Redirigir después de mostrar el loader
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 500);
+                    }
+                });
+            }
+        });
+    }
+
+    // Mostrar mensajes al cargar la página
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Procesar mensajes Django
+        const mensajes = document.querySelectorAll('#django-messages div');
+        mensajes.forEach(msg => {
+            mostrarAlerta(
+                msg.getAttribute('data-type'),
+                msg.getAttribute('data-message')
+            );
+        });
+    });
+</script>
+{% endblock %}
