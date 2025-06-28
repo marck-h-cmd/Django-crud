@@ -18,7 +18,7 @@
     <!-- AdminLTE CDN (temporal) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    {% block estilos %} {% endblock %}
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -126,7 +126,7 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{% url 'listar_ventas' %}" class="nav-link">
                                         <i class="fa fa-users"></i>
                                         <p>Ventas</p>
                                     </a>

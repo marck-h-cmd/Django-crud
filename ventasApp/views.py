@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 
-from ventasApp.models import Categoria , Producto, Cliente
+from ventasApp.models import Categoria , Producto, Cliente,CabeceraVenta,DetalleVenta,Tipo,Parametro
 from django.db.models import Q 
 from django.contrib import messages
-from .forms import CategoriaForm,ProductoForm, ClienteForm
+from .forms import CategoriaForm,ProductoForm, ClienteForm,CabeceraVentaForm
+from django.http import JsonResponse
+from django.core.paginator import Paginator
 # Create your views here.
 def listarcategoria(request):
     queryset=request.GET.get("buscar")
@@ -122,3 +124,91 @@ def eliminar_cliente(request, id):
         messages.success(request, '¡Cliente eliminado exitosamente!')
         return redirect('listar_clientes')
     return render(request, 'clientes/eliminar_cliente.html', {'cliente': cliente})
+
+
+def crear_venta(request):
+    if request.method == 'POST':
+        form = CabeceraVentaForm(request.POST)
+        if form.is_valid():
+
+            cabecera = form.save(commit=False)
+            
+            productos = request.POST.getlist('cod_producto[]')
+            unidades = request.POST.getlist('unidad[]')
+            cantidades = request.POST.getlist('cantidad[]')
+            precios = request.POST.getlist('pventa[]')
+
+            subtotal = 0
+            detalles = []
+            
+            for i in range(len(productos)):
+                if productos[i] and cantidades[i] and precios[i]:
+                    cantidad = float(cantidades[i])
+                    precio = float(precios[i])
+                    item_total = cantidad * precio
+                    subtotal += item_total
+                    
+                    detalles.append({
+                        'producto_id': productos[i],
+                        'unidad': unidades[i],
+                        'cantidad': cantidad,
+                        'precio': precio,
+                        'subtotal': item_total
+                    })
+            
+            cabecera.subtotal = subtotal
+            cabecera.igv = subtotal * 0.18  
+            cabecera.total = subtotal * 1.18
+            cabecera.save()
+            
+
+            for detalle in detalles:
+                DetalleVenta.objects.create(
+                    venta=cabecera,
+                    idproducto=detalle['producto_id'],
+                    precio=detalle['precio'],
+                    cantidad=detalle['cantidad']
+                )
+            
+            messages.success(request, 'Venta registrada con éxito!')
+            return redirect('listar_ventas')
+    else:
+        form = CabeceraVentaForm()
+    
+    tipos = Tipo.objects.all()
+    productos = Producto.objects.filter(estado=True)
+    
+
+    tipo_default = tipos.first()
+    parametros = Parametro.objects.filter(tipo=tipo_default).first()
+    
+    context = {
+        'form': form,
+        'tipos': tipos,
+        'productos': productos,
+        'nrodoc_default': parametros.numeracion if parametros else ''
+    }
+    return render(request, 'ventas/agregar.html', context)
+
+def listar_ventas(request):
+    buscarpor = request.GET.get('buscarpor', '')
+    
+    if buscarpor:
+        ventas = CabeceraVenta.objects.filter(
+            Q(nrodoc__icontains=buscarpor) |
+            Q(cliente__nomcliente__icontains=buscarpor) |
+            Q(cliente__ruc_dni__icontains=buscarpor)
+        ).select_related('tipo', 'cliente').order_by('-fecha_venta')
+    else:
+        ventas = CabeceraVenta.objects.all().select_related('tipo', 'cliente').order_by('-fecha_venta')
+    
+   
+    paginator = Paginator(ventas, 10)  
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'buscarpor': buscarpor,
+    }
+    return render(request, 'ventas/listar.html', context)

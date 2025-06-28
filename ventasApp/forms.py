@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import fields 
-from .models import Categoria,  Producto, Cliente
+from .models import Categoria,  Producto, Cliente, CabeceraVenta,Tipo
 class CategoriaForm(forms.ModelForm):
  
     class Meta:
@@ -25,7 +25,7 @@ class ProductoForm(forms.ModelForm):
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ['apellido', 'nombre', 'direccion', 'sexo']
+        fields = ['apellido', 'nombre', 'direccion', 'sexo','ruc_dni']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,3 +37,24 @@ class ClienteForm(forms.ModelForm):
             ('F', 'Femenino')
         ]
         
+        
+
+class CabeceraVentaForm(forms.ModelForm):
+    class Meta:
+        model = CabeceraVenta
+        fields = ['fecha_venta', 'tipo', 'nrodoc', 'idcliente']
+        widgets = {
+            'fecha_venta': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'tipo': forms.Select(attrs={'class': 'form-control', 'onchange': 'mostrarTipo()'}),
+            'nrodoc': forms.TextInput(attrs={'class': 'form-control'}),
+            'idcliente': forms.Select(attrs={
+                'class': 'form-control selectpicker',
+                'data-live-search': 'true',
+                'onchange': 'mostrarCliente()'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['idcliente'].queryset = Cliente.objects.filter(estado=True)
+        self.fields['tipo'].queryset = Tipo.objects.all()
