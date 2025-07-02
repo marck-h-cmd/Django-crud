@@ -89,9 +89,9 @@ WSGI_APPLICATION = 'Py1.wsgi.application'
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':  'bdsist',
+        'NAME':  'dbsist',
         'USER':  'root',
-        'PASSWORD': '',
+        'PASSWORD': 'kali',
         'HOST':  'localhost',
         'PORT':  '3306',
     }
@@ -133,7 +133,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR,'Py1/static')] 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,'Py1/static'),
+    os.path.join(BASE_DIR, 'gestionVentas/static'),] 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 

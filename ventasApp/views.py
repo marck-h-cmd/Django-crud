@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from ventasApp.models import Categoria , Producto, Cliente,CabeceraVenta,DetalleVenta,Tipo,Parametro
-from django.db.models import Q 
+from django.db.models import Q, F
 from django.contrib import messages
 from .forms import CategoriaForm,ProductoForm, ClienteForm,CabeceraVentaForm
 from django.http import JsonResponse
@@ -127,6 +127,12 @@ def eliminar_cliente(request, id):
 
 
 def crear_venta(request):
+    print("POST keys:", request.POST.keys())  # Para ver todas las claves
+
+    print("cod_producto:", request.POST.getlist('cod_producto'))
+    print("unidad:", request.POST.getlist('unidad'))
+    print("cantidad:", request.POST.getlist('cantidad'))
+    print("pventa:", request.POST.getlist('pventa'))
     if request.method == 'POST':
         form = CabeceraVentaForm(request.POST)
         if form.is_valid():
@@ -172,10 +178,13 @@ def crear_venta(request):
             
             messages.success(request, 'Venta registrada con éxito!')
             return redirect('listar_ventas')
+        else:
+            print("ERRORES EN FORMULARIO:", form.errors)
     else:
         form = CabeceraVentaForm()
     
     tipos = Tipo.objects.all()
+    clientes = Cliente.objects.filter(estado=True)
     productos = Producto.objects.filter(estado=True)
     
 
@@ -185,6 +194,7 @@ def crear_venta(request):
     context = {
         'form': form,
         'tipos': tipos,
+        'clientes': clientes,
         'productos': productos,
         'nrodoc_default': parametros.numeracion if parametros else ''
     }
@@ -198,9 +208,9 @@ def listar_ventas(request):
             Q(nrodoc__icontains=buscarpor) |
             Q(cliente__nomcliente__icontains=buscarpor) |
             Q(cliente__ruc_dni__icontains=buscarpor)
-        ).select_related('tipo', 'cliente').order_by('-fecha_venta')
+        ).select_related('tipo', 'cliente').order_by('fecha_venta')
     else:
-        ventas = CabeceraVenta.objects.all().select_related('tipo', 'cliente').order_by('-fecha_venta')
+        ventas = CabeceraVenta.objects.all().select_related('tipo', 'cliente').order_by('fecha_venta')
     
    
     paginator = Paginator(ventas, 10)  
@@ -212,3 +222,59 @@ def listar_ventas(request):
         'buscarpor': buscarpor,
     }
     return render(request, 'ventas/listar.html', context)
+
+def producto_codigo(request, idproducto):
+    try:
+        producto = (Producto.objects
+                    .filter(estado=1, idproducto=idproducto)
+                    .select_related('idunidad')
+                    .annotate(unidad=F('idunidad__descripcion'))
+                    .values(
+                        'idproducto',
+                        'descripcion',
+                        'unidad',
+                        'precio',
+                        'stock'
+                    )
+                    .first())
+
+        if producto is None:
+            return JsonResponse({'error': f'No se encontró el producto con ID {idproducto}'}, status=404)
+
+        # Forzar conversión de Decimal a float
+        if 'precio' in producto:
+            producto['precio'] = float(producto['precio'])
+
+        return JsonResponse(producto)
+    except Exception as e:
+        print("ERROR EN producto_codigo:", e)  # 👈 Añade esta línea
+        return JsonResponse({'error': str(e)}, status=500)
+
+    
+def por_tipo(request, id):
+    try:
+        datos_qs = (Parametro.objects
+                    .filter(tipo_id=id)
+                    .annotate(descripcion_tipo=F('tipo__descripcion'))
+                    .values('serie', 'numeracion', 'descripcion_tipo'))
+        datos_list = list(datos_qs)
+
+        if not datos_list:
+            return JsonResponse(
+                {'error': f'No se encontraron datos para el tipo con ID {id}'},
+                status=404
+            )
+
+        return JsonResponse(datos_list, safe=False)
+
+    except Exception as e:
+        # Imprimimos el error real en consola para depurar
+        print("ERROR en por_tipo:", repr(e))
+        return JsonResponse({'error': str(e)}, status=500)
+    
+def cliente_id(request, id):
+    try:
+        c = Cliente.objects.get(pk=id)
+        return JsonResponse({'ruc_dni': c.ruc_dni, 'direccion': c.direccion})
+    except Cliente.DoesNotExist:
+        return JsonResponse({}, status=404)

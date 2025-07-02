@@ -13,17 +13,17 @@ $(document).ready(function() {
     $('#id_fecha_venta').val(new Date().toLocaleDateString('es-PE'));
     
     // Product change event
-    $('#producto_id').change(function() {
+    $('#idproducto').change(function() {
         mostrarProducto();
     });
     
     // Client change event
-    $('#id_idcliente').change(function() {
+    $('#idcliente').change(function() {
         mostrarCliente();
     });
     
     // Type change event
-    $('#id_tipo').change(function() {
+    $('#idtipo').change(function() {
         mostrarTipo();
     });
     
@@ -33,28 +33,25 @@ $(document).ready(function() {
     });
 });
 
-var cont = 0;
-var total = 0;
-var detalleventa = [];
-var subtotal = [];
-var controlproducto = [];
+let cont = 0;
+let total = 0;
+let detalleventa = [];
+const subtotal = [];
+const controlproducto = [];
 
 function mostrarCliente() {
-    const clienteText = $('#id_idcliente option:selected').text();
-    const clienteValue = $('#id_idcliente').val();
-    
-    if (clienteValue && clienteValue !== '0') {
-        // Assuming the value is in format "id_ruc_direccion"
-        const datos = clienteValue.split('_');
-        $('#ruc').val(datos[1] || '');
-        $('#direccion').val(datos[2] || '');
-    }
+  const id = $('#idcliente').val();
+  if (!id) return;
+  $.get(`/ventas/mostrarCliente/${id}/`, function(data) {
+    $('#ruc').val(data.ruc_dni);
+    $('#direccion').val(data.direccion);
+  });
 }
 
 function mostrarProducto() {
-    const productoId = $('#producto_id').val();
-    if (productoId && productoId !== '0') {
-        $.get(`/get_producto_info/${productoId}/`, function(data) {
+    const idproducto = $('#idproducto').val();
+    if (idproducto && idproducto !== '0') {
+        $.get(`/ventas/mostrarProducto/${idproducto}/`, function(data) {
             $('#unidad').val(data.unidad);
             $('#precio').val(data.precio);
             $('#stock').val(data.stock);
@@ -63,10 +60,12 @@ function mostrarProducto() {
 }
 
 function mostrarTipo() {
-    const tipoId = $('#id_tipo').val();
-    if (tipoId) {
-        $.get(`/get_tipo_info/${tipoId}/`, function(data) {
-            $('#id_nrodoc').val(data.numeracion);
+    const idtipo = $('#idtipo').val();
+    if (idtipo) {
+        $.get(`/ventas/mostrarTipo/${idtipo}/`, function(data) {
+        if (Array.isArray(data) && data.length > 0) {
+            $('#id_nrodoc').val(data[0].numeracion);
+            }
         });
     }
 }
@@ -79,15 +78,17 @@ function mostrarMensajeError(mensaje) {
 }
 
 function agregarDetalle() {
+    
+
     const ruc = $('#ruc').val();
     if (!ruc) {
         mostrarMensajeError("Por favor seleccione el Cliente");
         return false;
     }
     
-    const productoId = $('#producto_id').val();
-    const productoDesc = $('#producto_id option:selected').text();
-    if (productoId === '0') {
+    const idproducto = $('#idproducto').val();
+    const productoDesc = $('#idproducto option:selected').text();
+    if (idproducto === '0') {
         mostrarMensajeError("Por favor seleccione el Producto");
         return false;
     }
@@ -112,29 +113,38 @@ function agregarDetalle() {
     }
     
     // Check for duplicate products
-    if (controlproducto.includes(productoId)) {
+    if (controlproducto.includes(idproducto)) {
         mostrarMensajeError("No puede volver a vender el mismo producto");
         return false;
     }
+    
+    console.log("Valores a agregar:", {
+        idproducto,
+        productoDesc,
+        cantidad: $('#cantidad').val(),
+        precio: $('#precio').val(),
+        stock: $('#stock').val(),
+        unidad: $('#unidad').val()
+    });
     
     // Add to cart
     const unidad = $('#unidad').val();
     const itemSubtotal = cantidad * precio;
     
     subtotal[cont] = itemSubtotal;
-    controlproducto[cont] = productoId;
+    controlproducto[cont] = idproducto;
     total += itemSubtotal;
     
     const fila = `
         <tr class="selected" id="fila${cont}">
             <td class="text-center">
-                <button type="button" class="btn btn-danger btn-xs" onclick="eliminardetalle('${productoId}', ${cont});">
+                <button type="button" class="btn btn-danger btn-xs" onclick="eliminardetalle('${idproducto}', ${cont});">
                     <i class="fas fa-times"></i>
                 </button>
             </td>
             <td class="text-right">
-                <input type="hidden" name="cod_producto[]" value="${productoId}">
-                ${productoId}
+                <input type="hidden" name="cod_producto[]" value="${idproducto}">
+                ${idproducto}
             </td>
             <td>${productoDesc}</td>
             <td>
@@ -155,7 +165,7 @@ function agregarDetalle() {
     
     $('#detalles tbody').append(fila);
     detalleventa.push({
-        codigo: productoId,
+        codigo: idproducto,
         unidad: unidad,
         cantidad: cantidad,
         pventa: precio,
@@ -170,7 +180,7 @@ function agregarDetalle() {
 function limpiar() {
     $('#cantidad').val('');
     $('#precio').val('');
-    $('#producto_id').val('0').trigger('change');
+    $('#idproducto').val('0').trigger('change');
 }
 
 function eliminardetalle(codigo, index) {

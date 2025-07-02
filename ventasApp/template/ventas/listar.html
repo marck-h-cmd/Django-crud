@@ -48,7 +48,6 @@
                     <th scope="col">RUC/DNI</th>
                     <th scope="col">Nombres/Razon</th>
                     <th scope="col">Total</th>
-                    <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,21 +57,15 @@
                     {% else %}
                     {% for venta in page_obj.object_list %}
                     <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
+                        
                         <td>{{ venta.idventa }}</td>
+                        <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ venta.tipo.descripcion }}</td>
                         <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
                         <td>{{ venta.cliente.ruc_dni }}</td>
-                        <td>{{ venta.cliente.nomcliente }}</td>
+                        <td>{{ venta.cliente.nombre}} {{venta.cliente.apellido}}</td>
                         <td>S/ {{ venta.total|floatformat:2 }}</td>
-                        <td>
-                            <a href="{% url 'editar_venta' venta.idventa %}" class="btn btn-info btn-sm">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-                            <a href="{% url 'eliminar_venta' venta.idventa %}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </a>
-                        </td>
+                        
                     </tr>
                     {% endfor %}
                     {% endif %}

@@ -7,14 +7,23 @@ class Categoria(models.Model):
     descripcion=models.CharField(max_length=30)
     estado=models.BooleanField(default=True)
     
-    
+
+class Unidad(models.Model):
+    idunidad = models.AutoField(primary_key=True)
+    descripcion = models.CharField(max_length=50)
+    estado = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.descripcion
+
 class Producto(models.Model): 
-        idproducto=models.AutoField(primary_key=True)
-        descripcion=models.CharField(max_length=50) 
-        idcategoria=models.ForeignKey(Categoria,on_delete=models.CASCADE, db_column='idcategoria') 
-        precio=models.FloatField()
-        stock=models.IntegerField() 
-        estado=models.BooleanField(default=True)  
+    idproducto = models.AutoField(primary_key=True)
+    descripcion = models.CharField(max_length=50)
+    idcategoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, db_column='idcategoria') 
+    idunidad = models.ForeignKey(Unidad, on_delete=models.CASCADE, db_column='idunidad')
+    precio = models.FloatField()
+    stock = models.IntegerField()
+    estado = models.BooleanField(default=True)
 
 class Cliente(models.Model):
     idcliente = models.AutoField(primary_key=True)
@@ -53,21 +62,27 @@ class Parametro(models.Model):
 
 class CabeceraVenta(models.Model):
     idventa = models.AutoField(primary_key=True)
-    idcliente = models.IntegerField()
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        db_column='idcliente',
+        related_name='ventas'     
+    )
     fecha_venta = models.DateField()
-    tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE)
-    estado = models.IntegerField()
-    total = models.FloatField()
-    nrodoc = models.CharField(max_length=12)
-    subtotal = models.FloatField()
-    igv = models.FloatField()
+    tipo        = models.ForeignKey(Tipo, on_delete=models.CASCADE)
+    estado      = models.BooleanField(default=True)
+    subtotal    = models.FloatField()
+    igv         = models.FloatField()
+    total       = models.FloatField()
+    nrodoc      = models.CharField(max_length=12)
 
     class Meta:
         verbose_name = "CabeceraVenta"
         verbose_name_plural = "CabeceraVentas"
 
     def __str__(self):
-        return f"Venta {self.venta_id} - {self.nrodoc}"
+        return f"Venta {self.idventa} - {self.nrodoc}"
+
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(CabeceraVenta, on_delete=models.CASCADE)

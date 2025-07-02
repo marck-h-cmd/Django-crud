@@ -43,7 +43,7 @@
                 <label>Tipo</label>
             </div>
             <div class="col-md-2">
-                {{ form.tipo }}
+            {{ form.tipo }}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-1">
@@ -59,7 +59,14 @@
                 <label>Cliente</label>
             </div>
             <div class="col-md-7">
-                {{ form.idcliente }}
+                <select name="cliente" id="idcliente" class="form-control selectpicker" data-live-search="true" onchange="mostrarCliente()" required>
+                    <option value="">-- Seleccione Cliente --</option>
+                    {% for c in clientes %}
+                        <option value="{{ c.idcliente }}">
+                        {{ c.apellido }} {{ c.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-1">
@@ -84,7 +91,7 @@
                 <label>Producto</label>
             </div>
             <div class="col-md-6">
-                <select class="form-control selectpicker" id="producto_id" data-live-search="true">
+                <select class="form-control selectpicker" id="idproducto" data-live-search="true">
                     <option value="0">- Seleccione Producto -</option>
                     {% for producto in productos %}
                     <option value="{{ producto.idproducto }}">{{ producto.descripcion }}</option>
@@ -94,6 +101,7 @@
             <div class="col-md-1 text-right">
                 <label>Unidad:</label>
             </div>
+
             <div class="col-md-3">
                 <input type="text" class="form-control" name="unidad" id="unidad" readonly>
                 <input type="hidden" name="stock" id="stock">
@@ -163,8 +171,8 @@
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'assets/calendario/dist/locales/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'assets/calendario/dist/js/bootstrap-datepicker.es.min.js' %}"></script>
+<script src="{% static 'assets/calendario/dist/js/bootstrap-datepicker.min.js' %}"></script>
+<script src="{% static 'assets/calendario/dist/locales/bootstrap-datepicker.es.min.js' %}"></script>
 <script src="{% static 'assets/select2/bootstrap-select.min.js' %}"></script>
 <script src="{% static 'archivos/js/createdoc.js' %}"></script>
 {% endblock %}
