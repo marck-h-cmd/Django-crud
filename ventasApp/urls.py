@@ -2,7 +2,7 @@ from django.urls import path,include
 from ventasApp.views import (listarcategoria,agregarcategoria,editarcategoria,eliminarcategoria, 
                              listarproducto,agregarproducto,editarproducto,eliminarproducto,
                              listar_clientes, crear_cliente, actualizar_cliente, eliminar_cliente,crear_venta,listar_ventas,
-                             producto_codigo,por_tipo,cliente_id)
+                             producto_codigo,por_tipo,cliente_id,listarunidad,agregarunidad,editarunidad,eliminarunidad)
 from django.contrib.auth import views
 
 urlpatterns = [ 
@@ -10,6 +10,11 @@ urlpatterns = [
                 path('agregarcategoria/',agregarcategoria,name="agregarcategoria"),
                 path('editarcategoria/<int:id>/',editarcategoria ,name="editarcategoria"),
                 path('eliminarcategoria/<int:id>/',eliminarcategoria,name="eliminarcategoria"), 
+                
+                path('listaunidad/',listarunidad,name="listarunidad"),
+                path('agregarunidad/',agregarunidad,name="agregarunidad"),
+                path('editarunidad/<int:id>/',editarunidad ,name="editarunidad"),
+                path('eliminarunidad/<int:id>/',eliminarunidad,name="eliminarunidad"), 
                 
                 path('listaproducto/',listarproducto,name="listarproducto"),
                 path('agregarproducto/',agregarproducto,name="agregarproducto"),

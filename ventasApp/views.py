@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 
-from ventasApp.models import Categoria , Producto, Cliente,CabeceraVenta,DetalleVenta,Tipo,Parametro
+from ventasApp.models import Categoria , Producto, Cliente,CabeceraVenta,DetalleVenta,Tipo,Parametro,Unidad
 from django.db.models import Q, F
 from django.contrib import messages
-from .forms import CategoriaForm,ProductoForm, ClienteForm,CabeceraVentaForm
+from .forms import CategoriaForm,ProductoForm, ClienteForm,CabeceraVentaForm,UnidadForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 # Create your views here.
@@ -47,6 +47,45 @@ def eliminarcategoria(request,id):
  messages.success(request, '¡Categoría eliminada exitosamente!')
  return redirect("listarcategoria") 
 
+def listarunidad(request):
+    queryset=request.GET.get("buscar")
+    unidad=Unidad.objects.filter(estado=True) 
+    if queryset:
+        unidad=Unidad.objects.filter(Q(descripcion__icontains=queryset),estado=True).distinct() 
+    context={'unidad':unidad}
+    return render(request,"unidad/listar.html",context) 
+def agregarunidad(request):
+    if request.method=="POST":
+        form=UnidadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Unidad creada exitosamente!') 
+            return redirect("listarunidad") 
+    else:
+        form=CategoriaForm()
+    context={'form':form} 
+    
+    return render(request,"unidad/agregar.html",context) 
+
+def editarunidad(request,id):
+    unidad=Unidad.objects.get(idunidad=id)
+    if request.method=="POST":
+        form=UnidadForm(request.POST,instance=unidad)
+        if form.is_valid():
+            form.save() 
+            messages.success(request, '¡Unidad actualizada exitosamente!')
+            return redirect("listarunidad") 
+    else:
+        form=UnidadForm(instance=unidad)
+    context={"form":form} 
+    return render(request,"categoria/editar.html",context) 
+
+def eliminarunidad(request,id):
+ unidad=Unidad.objects.get(idunidad=id) 
+ unidad.estado=False
+ unidad.save()
+ messages.success(request, '¡Unidad eliminada exitosamente!')
+ return redirect("listarunidad") 
 
 def listarproducto(request):
     queryset=request.GET.get("buscar")
