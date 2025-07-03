@@ -6,7 +6,7 @@ from django.contrib import messages
 from .forms import CategoriaForm,ProductoForm, ClienteForm,CabeceraVentaForm,UnidadForm
 from django.http import JsonResponse
 from django.core.paginator import Paginator
-# Create your views here.
+
 def listarcategoria(request):
     queryset=request.GET.get("buscar")
     categoria=Categoria.objects.filter(estado=True) 
@@ -166,7 +166,7 @@ def eliminar_cliente(request, id):
 
 
 def crear_venta(request):
-    print("POST keys:", request.POST.keys())  # Para ver todas las claves
+    print("POST keys:", request.POST.keys())
 
     print("cod_producto:", request.POST.getlist('cod_producto'))
     print("unidad:", request.POST.getlist('unidad'))
@@ -204,6 +204,7 @@ def crear_venta(request):
             cabecera.subtotal = subtotal
             cabecera.igv = subtotal * 0.18  
             cabecera.total = subtotal * 1.18
+            cabecera.estado = True
             cabecera.save()
             
 
@@ -214,6 +215,16 @@ def crear_venta(request):
                     precio=detalle['precio'],
                     cantidad=detalle['cantidad']
                 )
+                
+                # 👈 NUEVO: Descontar stock del producto
+                try:
+                    producto = Producto.objects.get(idproducto=detalle['producto_id'])
+                    producto.stock -= detalle['cantidad']
+                    producto.save()
+                    print(f"Stock actualizado para producto {producto.descripcion}: -{detalle['cantidad']}")
+                except Producto.DoesNotExist:
+                    print(f"Producto con ID {detalle['producto_id']} no encontrado")
+                    continue
             
             messages.success(request, 'Venta registrada con éxito!')
             return redirect('listar_ventas')
@@ -280,13 +291,12 @@ def producto_codigo(request, idproducto):
         if producto is None:
             return JsonResponse({'error': f'No se encontró el producto con ID {idproducto}'}, status=404)
 
-        # Forzar conversión de Decimal a float
         if 'precio' in producto:
             producto['precio'] = float(producto['precio'])
 
         return JsonResponse(producto)
     except Exception as e:
-        print("ERROR EN producto_codigo:", e)  # 👈 Añade esta línea
+        print("ERROR EN producto_codigo:", e)
         return JsonResponse({'error': str(e)}, status=500)
 
     
@@ -307,7 +317,6 @@ def por_tipo(request, id):
         return JsonResponse(datos_list, safe=False)
 
     except Exception as e:
-        # Imprimimos el error real en consola para depurar
         print("ERROR en por_tipo:", repr(e))
         return JsonResponse({'error': str(e)}, status=500)
     
@@ -317,3 +326,35 @@ def cliente_id(request, id):
         return JsonResponse({'ruc_dni': c.ruc_dni, 'direccion': c.direccion})
     except Cliente.DoesNotExist:
         return JsonResponse({}, status=404)
+    
+def cancelar_venta(request, id):
+    try:
+        venta = CabeceraVenta.objects.get(idventa=id)
+    
+        if not venta.estado:
+            messages.warning(request, 'La venta ya está cancelada.')
+            return redirect('listar_ventas')
+
+        detalles = DetalleVenta.objects.filter(venta=venta)
+
+        for detalle in detalles:
+            try:
+                producto = Producto.objects.get(idproducto=detalle.idproducto)
+                producto.stock += detalle.cantidad
+                producto.save()
+                print(f"Stock actualizado para producto {producto.descripcion}: +{detalle.cantidad}")
+            except Producto.DoesNotExist:
+                print(f"Producto con ID {detalle.idproducto} no encontrado")
+                continue
+        
+        venta.estado = False
+        venta.save()
+        
+        messages.success(request, f'Venta {venta.nrodoc} cancelada exitosamente. Stock devuelto a los productos.')
+        
+    except CabeceraVenta.DoesNotExist:
+        messages.error(request, 'La venta no existe.')
+    except Exception as e:
+        messages.error(request, f'Error al cancelar la venta: {str(e)}')
+    
+    return redirect('listar_ventas')

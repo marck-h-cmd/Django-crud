@@ -89,9 +89,9 @@ WSGI_APPLICATION = 'Py1.wsgi.application'
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':  'bdsist',
+        'NAME':  'dbsist',
         'USER':  'root',
-        'PASSWORD': '',
+        'PASSWORD': 'kali',
         'HOST':  'localhost',
         'PORT':  '3306',
     }

@@ -21,6 +21,30 @@
         background-color: #3c8dbc;
         color: #fff;
     }
+
+    .stock-info {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 8px;
+        margin-top: 5px;
+        font-size: 12px;
+    }
+
+    .stock-disponible {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .stock-bajo {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .stock-medio {
+        color: #ffc107;
+        font-weight: bold;
+    }
 </style>
 {% endblock %}
 
@@ -101,11 +125,27 @@
             <div class="col-md-1 text-right">
                 <label>Unidad:</label>
             </div>
-
             <div class="col-md-3">
                 <input type="text" class="form-control" name="unidad" id="unidad" readonly>
                 <input type="hidden" name="stock" id="stock">
             </div>
+        </div>
+
+        <!-- Nueva fila para mostrar el stock -->
+        <div class="row mb-3">
+            <div class="col-md-1"></div>
+            <div class="col-md-6">
+                <div id="stock-display" class="stock-info" style="display: none;">
+                    <i class="fas fa-boxes"></i> 
+                    <strong>Stock disponible:</strong> 
+                    <span id="stock-cantidad">0</span> unidades
+                    <div id="stock-warning" style="display: none; margin-top: 5px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <small id="stock-message"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5"></div>
         </div>
 
         <div class="row mb-3">

@@ -31,7 +31,6 @@
             </form>
         </nav>
 
-
         <div id="django-messages" style="display:none;">
             {% for message in messages %}
             <div data-type="{{ message.tags }}" data-message="{{ message|escapejs }}"></div>
@@ -48,27 +47,48 @@
                     <th scope="col">RUC/DNI</th>
                     <th scope="col">Nombres/Razon</th>
                     <th scope="col">Total</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% if page_obj.object_list.count <= 0 %} <tr>
-                    <td colspan="8">No hay registros</td>
-                    </tr>
-                    {% else %}
-                    {% for venta in page_obj.object_list %}
-                    <tr>
-                        
-                        <td>{{ venta.idventa }}</td>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>{{ venta.tipo.descripcion }}</td>
-                        <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
-                        <td>{{ venta.cliente.ruc_dni }}</td>
-                        <td>{{ venta.cliente.nombre}} {{venta.cliente.apellido}}</td>
-                        <td>S/ {{ venta.total|floatformat:2 }}</td>
-                        
-                    </tr>
-                    {% endfor %}
-                    {% endif %}
+                {% if page_obj.object_list.count <= 0 %}
+                <tr>
+                    <td colspan="9">No hay registros</td>
+                </tr>
+                {% else %}
+                {% for venta in page_obj.object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ venta.idventa }}</td>
+                    <td>{{ venta.tipo.descripcion }}</td>
+                    <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
+                    <td>{{ venta.cliente.ruc_dni }}</td>
+                    <td>{{ venta.cliente.nombre}} {{venta.cliente.apellido}}</td>
+                    <td>S/ {{ venta.total|floatformat:2 }}</td>
+                    <td>
+                        {% if venta.estado %}
+                            <span class="badge badge-success">Activa</span>
+                        {% else %}
+                            <span class="badge badge-danger">Cancelada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if venta.estado %}
+                            <button type="button" class="btn btn-danger btn-sm" 
+                                    onclick="confirmarCancelacion(event, '{% url 'cancelar_venta' venta.idventa %}')"
+                                    data-toggle="tooltip" 
+                                    data-placement="top" 
+                                    title="Cancelar Venta">
+                                <i class="fas fa-ban"></i> Cancelar
+                            </button>
+                        {% else %}
+                            <span class="text-muted">Cancelada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
 
@@ -124,7 +144,37 @@
         });
     }
 
-    // Función para confirmar eliminación
+    function confirmarCancelacion(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Confirmar Cancelación',
+            html: `<p>¿Estás seguro que deseas cancelar esta venta?</p>
+               <p class="text-warning"><small>Se devolverá el stock a los productos</small></p>
+               <p class="text-danger"><small>Esta acción no se puede deshacer</small></p>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '<i class="fa fa-ban"></i> Sí, cancelar venta',
+            cancelButtonText: '<i class="fa fa-times"></i> No cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Cancelando venta...',
+                    html: 'Por favor espere, devolviendo stock...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        setTimeout(() => {
+                            window.location.href = url;
+                        }, 1000);
+                    }
+                });
+            }
+        });
+    }
+
     function confirmarEliminacion(event, url) {
         event.preventDefault();
         Swal.fire({
@@ -157,12 +207,9 @@
         });
     }
 
-    // Mostrar mensajes al cargar la página
     document.addEventListener('DOMContentLoaded', function () {
-        // Inicializar tooltips
         $('[data-toggle="tooltip"]').tooltip();
 
-        // Procesar mensajes Django
         const mensajes = document.querySelectorAll('#django-messages div');
         mensajes.forEach(msg => {
             mostrarAlerta(

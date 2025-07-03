@@ -31,6 +31,11 @@ $(document).ready(function() {
     $('#btnadddet').click(function() {
         agregarDetalle();
     });
+
+    // Validar cantidad en tiempo real
+    $('#cantidad').on('input', function() {
+        validarCantidad();
+    });
 });
 
 let cont = 0;
@@ -50,12 +55,73 @@ function mostrarCliente() {
 
 function mostrarProducto() {
     const idproducto = $('#idproducto').val();
+    console.log("Producto seleccionado:", idproducto);
     if (idproducto && idproducto !== '0') {
         $.get(`/ventas/mostrarProducto/${idproducto}/`, function(data) {
+            console.log("Datos del producto:", data);
             $('#unidad').val(data.unidad);
             $('#precio').val(data.precio);
             $('#stock').val(data.stock);
+            
+            // 👈 NUEVO: Mostrar información del stock
+            mostrarStock(data.stock);
         });
+    } else {
+        // Ocultar información del stock si no hay producto seleccionado
+        $('#stock-display').hide();
+        $('#cantidad').val('');
+        $('#precio').val('');
+    }
+}
+
+function mostrarStock(stock) {
+    console.log("Mostrando stock:", stock);
+    const stockDisplay = $('#stock-display');
+    const stockCantidad = $('#stock-cantidad');
+    const stockWarning = $('#stock-warning');
+    const stockMessage = $('#stock-message');
+    
+    stockCantidad.text(stock);
+    stockDisplay.show();
+    
+    stockCantidad.removeClass('stock-disponible stock-medio stock-bajo');
+    stockWarning.hide();
+    
+    if (stock <= 0) {
+        stockCantidad.addClass('stock-bajo');
+        stockMessage.text('⚠️ Producto sin stock disponible');
+        stockWarning.show();
+    } else if (stock <= 5) {
+        stockCantidad.addClass('stock-bajo');
+        stockMessage.text('⚠️ Stock bajo - Quedan pocas unidades');
+        stockWarning.show();
+    } else if (stock <= 20) {
+        stockCantidad.addClass('stock-medio');
+        stockMessage.text('⚠️ Stock medio - Considere reabastecer pronto');
+        stockWarning.show();
+    } else {
+        stockCantidad.addClass('stock-disponible');
+    }
+}
+
+function validarCantidad() {
+    const cantidad = parseFloat($('#cantidad').val()) || 0;
+    const stock = parseFloat($('#stock').val()) || 0;
+    const cantidadInput = $('#cantidad');
+    
+    if (cantidad > stock && stock > 0) {
+        cantidadInput.addClass('is-invalid');
+        // Mostrar tooltip de error si no existe
+        if (!cantidadInput.attr('data-original-title')) {
+            cantidadInput.attr('data-toggle', 'tooltip');
+            cantidadInput.attr('data-placement', 'top');
+            cantidadInput.attr('title', `Cantidad máxima disponible: ${stock}`);
+            cantidadInput.tooltip();
+        }
+        cantidadInput.tooltip('show');
+    } else {
+        cantidadInput.removeClass('is-invalid');
+        cantidadInput.tooltip('hide');
     }
 }
 
@@ -78,8 +144,6 @@ function mostrarMensajeError(mensaje) {
 }
 
 function agregarDetalle() {
-    
-
     const ruc = $('#ruc').val();
     if (!ruc) {
         mostrarMensajeError("Por favor seleccione el Cliente");
@@ -101,8 +165,13 @@ function agregarDetalle() {
         return false;
     }
     
+    if (stock <= 0) {
+        mostrarMensajeError("No hay stock disponible para este producto");
+        return false;
+    }
+    
     if (cantidad > stock) {
-        mostrarMensajeError(`No se tiene tal cantidad de producto, solo hay ${stock}`);
+        mostrarMensajeError(`No se tiene tal cantidad de producto, solo hay ${stock} unidades disponibles`);
         return false;
     }
     
@@ -181,6 +250,8 @@ function limpiar() {
     $('#cantidad').val('');
     $('#precio').val('');
     $('#idproducto').val('0').trigger('change');
+    $('#stock-display').hide();
+    $('#cantidad').removeClass('is-invalid').tooltip('hide');
 }
 
 function eliminardetalle(codigo, index) {
