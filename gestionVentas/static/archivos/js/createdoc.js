@@ -271,25 +271,30 @@ function agregarDetalle() {
 }
 
 function actualizarCalculos() {
-    // Calcular subtotal (sin IGV)
+    const tipoDocumento = $('#idtipo').val();
     const subtotalSinIGV = total;
     
-    // Calcular IGV (18%)
-    const igv = subtotalSinIGV * 0.18;
+    if (tipoDocumento == 1) { // Factura
+        const igv = subtotalSinIGV * 0.18;
+        const totalConIGV = subtotalSinIGV + igv;
+        
+        $('#subtotal_display').val(subtotalSinIGV.toFixed(2));
+        $('#igv_display').val(igv.toFixed(2)).parent().show(); // Mostrar IGV
+        $('#total').val(totalConIGV.toFixed(2));
+    } else { // Boleta
+        $('#subtotal_display').val(subtotalSinIGV.toFixed(2));
+        $('#igv_display').val('0.00').parent().hide(); // Ocultar IGV
+        $('#total').val(subtotalSinIGV.toFixed(2));
+    }
     
-    // Calcular total con IGV
-    const totalConIGV = subtotalSinIGV + igv;
-    
-    // Actualizar campos en la interfaz
-    $('#subtotal_display').val(subtotalSinIGV.toFixed(2));
-    $('#igv_display').val(igv.toFixed(2));
-    $('#total').val(totalConIGV.toFixed(2));
-    
-    // Animar los campos cuando cambien
+    // Animar los campos
     animarCampo('#subtotal_display');
-    animarCampo('#igv_display');
     animarCampo('#total');
 }
+
+$('#idtipo').change(function() {
+    actualizarCalculos();
+})
 
 function animarCampo(selector) {
     $(selector).addClass('highlight');

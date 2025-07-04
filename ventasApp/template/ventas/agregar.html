@@ -20,7 +20,7 @@
     .thead-default {
         background: linear-gradient(135deg, #3c8dbc 0%, #2c7aa0 100%);
         color: #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .stock-info {
@@ -30,7 +30,7 @@
         padding: 12px;
         margin-top: 5px;
         font-size: 13px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .stock-disponible {
@@ -53,7 +53,7 @@
         border-radius: 10px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         border-left: 4px solid #3c8dbc;
     }
 
@@ -79,7 +79,7 @@
 
     .btn-action:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .btn-primary.btn-action {
@@ -98,7 +98,7 @@
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 10px;
         padding: 20px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         border: 1px solid #dee2e6;
     }
 
@@ -179,9 +179,17 @@
     }
 
     @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
     }
 
     .badge {
@@ -210,7 +218,7 @@
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">
-                <i class="fas fa-cash-register text-primary"></i> 
+                <i class="fas fa-cash-register text-primary"></i>
                 Registrar Nueva Venta
             </h1>
         </div>
@@ -230,7 +238,7 @@
                 <i class="fas fa-info-circle"></i>
                 Información General
             </h4>
-            
+
             <div class="row mb-3">
                 <div class="col-md-3">
                     <label class="form-label">
@@ -268,18 +276,19 @@
                 <i class="fas fa-user-tie"></i>
                 Información del Cliente
             </h4>
-            
+
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label">
                         <i class="fas fa-user text-primary"></i> Cliente
                     </label>
-                    <select name="cliente" id="idcliente" class="form-control selectpicker" data-live-search="true" onchange="mostrarCliente()" required>
+                    <select name="cliente" id="idcliente" class="form-control selectpicker" data-live-search="true"
+                        onchange="mostrarCliente()" required>
                         <option value="">-- Seleccione Cliente --</option>
                         {% for c in clientes %}
-                            <option value="{{ c.idcliente }}">
+                        <option value="{{ c.idcliente }}">
                             {{ c.apellido }} {{ c.nombre }}
-                            </option>
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -365,8 +374,8 @@
             <div class="row">
                 <div class="col-md-5">
                     <div id="stock-display" class="stock-info" style="display: none;">
-                        <i class="fas fa-boxes"></i> 
-                        <strong>Stock disponible:</strong> 
+                        <i class="fas fa-boxes"></i>
+                        <strong>Stock disponible:</strong>
                         <span id="stock-cantidad">0</span> unidades
                         <div id="stock-warning" style="display: none; margin-top: 5px;">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -426,23 +435,26 @@
                             <i class="fas fa-calculator text-info"></i>
                             <span>Subtotal:</span>
                         </div>
-                        <input type="text" class="form-control calculation-input" id="subtotal_display" readonly value="0.00">
+                        <input type="text" class="form-control calculation-input" id="subtotal_display" readonly
+                            value="0.00">
                     </div>
-                    
-                    <div class="calculation-row">
+
+                    <div class="calculation-row" id="igv-row" style="display: none;">
                         <div class="calculation-label">
                             <i class="fas fa-percent text-warning"></i>
                             <span>IGV (18%):</span>
                         </div>
-                        <input type="text" class="form-control calculation-input" id="igv_display" readonly value="0.00">
+                        <input type="text" class="form-control calculation-input" id="igv_display" readonly
+                            value="0.00">
                     </div>
-                    
+
                     <div class="calculation-row">
                         <div class="calculation-label">
                             <i class="fas fa-coins text-success"></i>
                             <span>Total:</span>
                         </div>
-                        <input type="text" class="form-control calculation-input total-input" name="total" id="total" readonly value="0.00">
+                        <input type="text" class="form-control calculation-input total-input" name="total" id="total"
+                            readonly value="0.00">
                     </div>
                 </div>
             </div>

@@ -178,6 +178,8 @@ def crear_venta(request):
 
             cabecera = form.save(commit=False)
             
+            tipo_documento = form.cleaned_data['tipo']
+            
             productos = request.POST.getlist('cod_producto[]')
             unidades = request.POST.getlist('unidad[]')
             cantidades = request.POST.getlist('cantidad[]')
@@ -200,10 +202,32 @@ def crear_venta(request):
                         'precio': precio,
                         'subtotal': item_total
                     })
+                    
             
-            cabecera.subtotal = subtotal
-            cabecera.igv = subtotal * 0.18  
-            cabecera.total = subtotal * 1.18
+            if tipo_documento.idtipo == 1:
+                
+                cabecera.subtotal = subtotal
+                cabecera.igv = subtotal * 0.18  
+                cabecera.total = subtotal * 1.18
+            else:
+                cabecera.subtotal = subtotal
+                cabecera.igv = subtotal * 0 
+                cabecera.total = subtotal
+            
+            parametro = Parametro.objects.get(tipo=tipo_documento)
+            
+
+            nuevo_nrodoc = f"{parametro.numeracion}-{parametro.serie}"
+            
+            try:
+                num = int(parametro.numeracion)
+                parametro.numeracion = str(num + 1).zfill(len(parametro.numeracion))
+            except ValueError:
+                parametro.numeracion += '1'
+            
+            parametro.save()
+            
+            cabecera.nrodoc = nuevo_nrodoc
             cabecera.estado = True
             cabecera.save()
             
