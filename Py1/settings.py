@@ -14,6 +14,8 @@ from pathlib import Path
 from django.contrib import messages 
 from django.contrib.messages import constants as message_constants
 import os
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -89,11 +91,11 @@ WSGI_APPLICATION = 'Py1.wsgi.application'
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':  'bdsist',
-        'USER':  'root',
-        'PASSWORD': '',
-        'HOST':  'localhost',
-        'PORT':  '3306',
+        'NAME':   os.getenv('DB_NAME'),
+        'USER':   os.getenv('DB_USER') ,
+        'PASSWORD':   os.getenv('DB_PASSWORD'),
+        'HOST':   os.getenv('HOST'),
+        'PORT':  os.getenv('PORT'),
     }
 }
 
