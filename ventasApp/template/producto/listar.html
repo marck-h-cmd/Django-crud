@@ -44,6 +44,7 @@
                             <th class="text-right">PRECIO</th>
                             <th class="text-center">STOCK</th>
                             <th>CATEGORÍA</th>
+                                <th>UNIDAD</th>
                             <th class="text-center">ACCIONES</th>
                         </tr>
                     </thead>
@@ -56,6 +57,7 @@
                                 <td class="text-right">S/ {{ item.precio|floatformat:2 }}</td>
                                 <td class="text-center">{{ item.stock }}</td>
                                 <td>{{ item.idcategoria.descripcion }}</td>
+                                  <td>{{ item.idunidad.descripcion }}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <a href="{% url 'editarproducto' item.idproducto %}" 

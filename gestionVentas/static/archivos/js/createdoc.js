@@ -36,6 +36,9 @@ $(document).ready(function() {
     $('#cantidad').on('input', function() {
         validarCantidad();
     });
+
+    // Inicializar cálculos
+    actualizarCalculos();
 });
 
 let cont = 0;
@@ -45,12 +48,12 @@ const subtotal = [];
 const controlproducto = [];
 
 function mostrarCliente() {
-  const id = $('#idcliente').val();
-  if (!id) return;
-  $.get(`/ventas/mostrarCliente/${id}/`, function(data) {
-    $('#ruc').val(data.ruc_dni);
-    $('#direccion').val(data.direccion);
-  });
+    const id = $('#idcliente').val();
+    if (!id) return;
+    $.get(`/ventas/mostrarCliente/${id}/`, function(data) {
+        $('#ruc').val(data.ruc_dni);
+        $('#direccion').val(data.direccion);
+    });
 }
 
 function mostrarProducto() {
@@ -63,7 +66,7 @@ function mostrarProducto() {
             $('#precio').val(data.precio);
             $('#stock').val(data.stock);
             
-            // 👈 NUEVO: Mostrar información del stock
+            // Mostrar información del stock
             mostrarStock(data.stock);
         });
     } else {
@@ -84,20 +87,21 @@ function mostrarStock(stock) {
     stockCantidad.text(stock);
     stockDisplay.show();
     
+    // Resetear clases
     stockCantidad.removeClass('stock-disponible stock-medio stock-bajo');
     stockWarning.hide();
     
     if (stock <= 0) {
         stockCantidad.addClass('stock-bajo');
-        stockMessage.text('⚠️ Producto sin stock disponible');
+        stockMessage.html('<i class="fas fa-exclamation-triangle"></i> Producto sin stock disponible');
         stockWarning.show();
     } else if (stock <= 5) {
         stockCantidad.addClass('stock-bajo');
-        stockMessage.text('⚠️ Stock bajo - Quedan pocas unidades');
+        stockMessage.html('<i class="fas fa-exclamation-triangle"></i> Stock bajo - Quedan pocas unidades');
         stockWarning.show();
     } else if (stock <= 20) {
         stockCantidad.addClass('stock-medio');
-        stockMessage.text('⚠️ Stock medio - Considere reabastecer pronto');
+        stockMessage.html('<i class="fas fa-exclamation-triangle"></i> Stock medio - Considere reabastecer pronto');
         stockWarning.show();
     } else {
         stockCantidad.addClass('stock-disponible');
@@ -129,18 +133,28 @@ function mostrarTipo() {
     const idtipo = $('#idtipo').val();
     if (idtipo) {
         $.get(`/ventas/mostrarTipo/${idtipo}/`, function(data) {
-        if (Array.isArray(data) && data.length > 0) {
-            $('#id_nrodoc').val(data[0].numeracion);
+            if (Array.isArray(data) && data.length > 0) {
+                $('#id_nrodoc').val(data[0].numeracion);
             }
         });
     }
 }
 
 function mostrarMensajeError(mensaje) {
-    $('#error-message').removeClass('hidden').text(mensaje);
+    $('#error-text').text(mensaje);
+    $('#error-message').removeClass('d-none').show();
+    
+    // Auto-hide después de 5 segundos
     setTimeout(function() {
-        $('#error-message').addClass('hidden');
+        $('#error-message').fadeOut(function() {
+            $(this).addClass('d-none');
+        });
     }, 5000);
+    
+    // Scroll to top para mostrar el error
+    $('html, body').animate({
+        scrollTop: 0
+    }, 500);
 }
 
 function agregarDetalle() {
@@ -207,28 +221,33 @@ function agregarDetalle() {
     const fila = `
         <tr class="selected" id="fila${cont}">
             <td class="text-center">
-                <button type="button" class="btn btn-danger btn-xs" onclick="eliminardetalle('${idproducto}', ${cont});">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="btn btn-danger btn-sm" onclick="eliminardetalle('${idproducto}', ${cont});" 
+                        title="Eliminar producto">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             </td>
-            <td class="text-right">
+            <td class="text-center">
                 <input type="hidden" name="cod_producto[]" value="${idproducto}">
-                ${idproducto}
+                <span class="badge badge-info">${idproducto}</span>
             </td>
-            <td>${productoDesc}</td>
+            <td>
+                <i class="fas fa-cube text-muted"></i> ${productoDesc}
+            </td>
             <td>
                 <input type="hidden" name="unidad[]" value="${unidad}">
-                ${unidad}
+                <span class="badge badge-secondary">${unidad}</span>
             </td>
-            <td class="text-right">
+            <td class="text-center">
                 <input type="hidden" name="cantidad[]" value="${cantidad}">
-                ${cantidad}
+                <span class="badge badge-primary">${cantidad}</span>
             </td>
             <td class="text-right">
                 <input type="hidden" name="pventa[]" value="${precio}">
-                ${precio.toFixed(2)}
+                <i class="fas fa-dollar-sign text-success"></i> ${precio.toFixed(2)}
             </td>
-            <td class="text-right">${itemSubtotal.toFixed(2)}</td>
+            <td class="text-right font-weight-bold">
+                <i class="fas fa-calculator text-info"></i> ${itemSubtotal.toFixed(2)}
+            </td>
         </tr>
     `;
     
@@ -242,8 +261,41 @@ function agregarDetalle() {
     });
     
     cont++;
-    $('#total').val(total.toFixed(2));
+    
+    // Actualizar cálculos
+    actualizarCalculos();
     limpiar();
+    
+    // Mostrar animación de éxito
+    animarCampo('#detalles tbody tr:last-child');
+}
+
+function actualizarCalculos() {
+    // Calcular subtotal (sin IGV)
+    const subtotalSinIGV = total;
+    
+    // Calcular IGV (18%)
+    const igv = subtotalSinIGV * 0.18;
+    
+    // Calcular total con IGV
+    const totalConIGV = subtotalSinIGV + igv;
+    
+    // Actualizar campos en la interfaz
+    $('#subtotal_display').val(subtotalSinIGV.toFixed(2));
+    $('#igv_display').val(igv.toFixed(2));
+    $('#total').val(totalConIGV.toFixed(2));
+    
+    // Animar los campos cuando cambien
+    animarCampo('#subtotal_display');
+    animarCampo('#igv_display');
+    animarCampo('#total');
+}
+
+function animarCampo(selector) {
+    $(selector).addClass('highlight');
+    setTimeout(function() {
+        $(selector).removeClass('highlight');
+    }, 1000);
 }
 
 function limpiar() {
@@ -252,17 +304,55 @@ function limpiar() {
     $('#idproducto').val('0').trigger('change');
     $('#stock-display').hide();
     $('#cantidad').removeClass('is-invalid').tooltip('hide');
+    
+    // Actualizar selectpicker
+    $('.selectpicker').selectpicker('refresh');
 }
 
 function eliminardetalle(codigo, index) {
-    total -= subtotal[index];
-    $('#fila' + index).remove();
+    // Confirmar eliminación
+    if (!confirm('¿Está seguro de eliminar este producto de la venta?')) {
+        return;
+    }
     
+    // Restar del total
+    total -= subtotal[index];
+    
+    // Remover fila con animación
+    $('#fila' + index).fadeOut(function() {
+        $(this).remove();
+    });
+    
+    // Remover de arrays de control
     const pos = controlproducto.indexOf(codigo);
     if (pos !== -1) {
         controlproducto.splice(pos, 1);
         detalleventa.splice(pos, 1);
     }
     
-    $('#total').val(total.toFixed(2));
+    // Actualizar cálculos
+    actualizarCalculos();
 }
+
+// Validación del formulario antes de enviar
+$('#venta-form').on('submit', function(e) {
+    if (detalleventa.length === 0) {
+        e.preventDefault();
+        mostrarMensajeError('Debe agregar al menos un producto a la venta');
+        return false;
+    }
+    
+    if (!$('#idcliente').val()) {
+        e.preventDefault();
+        mostrarMensajeError('Debe seleccionar un cliente para la venta');
+        return false;
+    }
+    
+    // Mostrar loading en el botón
+    $('#btnRegistrar').html('<i class="fas fa-spinner fa-spin"></i> Procesando...').prop('disabled', true);
+});
+
+// Inicializar tooltips
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});

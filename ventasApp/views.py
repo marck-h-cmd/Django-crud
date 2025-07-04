@@ -216,7 +216,7 @@ def crear_venta(request):
                     cantidad=detalle['cantidad']
                 )
                 
-                # 👈 NUEVO: Descontar stock del producto
+              
                 try:
                     producto = Producto.objects.get(idproducto=detalle['producto_id'])
                     producto.stock -= detalle['cantidad']
@@ -256,7 +256,6 @@ def listar_ventas(request):
     if buscarpor:
         ventas = CabeceraVenta.objects.filter(
             Q(nrodoc__icontains=buscarpor) |
-            Q(cliente__nomcliente__icontains=buscarpor) |
             Q(cliente__ruc_dni__icontains=buscarpor)
         ).select_related('tipo', 'cliente').order_by('fecha_venta')
     else:

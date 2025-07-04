@@ -18,17 +18,19 @@
     }
 
     .thead-default {
-        background-color: #3c8dbc;
+        background: linear-gradient(135deg, #3c8dbc 0%, #2c7aa0 100%);
         color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .stock-info {
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border: 1px solid #dee2e6;
-        border-radius: 4px;
-        padding: 8px;
+        border-radius: 8px;
+        padding: 12px;
         margin-top: 5px;
-        font-size: 12px;
+        font-size: 13px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .stock-disponible {
@@ -45,142 +47,368 @@
         color: #ffc107;
         font-weight: bold;
     }
+
+    .form-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #3c8dbc;
+    }
+
+    .section-header {
+        color: #3c8dbc;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action {
+        border-radius: 25px;
+        padding: 8px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary.btn-action {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+
+    .btn-success.btn-action {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+
+    .btn-danger.btn-action {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+
+    .calculation-panel {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        border: 1px solid #dee2e6;
+    }
+
+    .calculation-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 8px 0;
+    }
+
+    .calculation-row:last-child {
+        margin-bottom: 0;
+        border-top: 2px solid #3c8dbc;
+        padding-top: 15px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .calculation-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .calculation-input {
+        background-color: #fff !important;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-weight: 600;
+        text-align: right;
+        width: 120px;
+    }
+
+    .total-input {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        color: white !important;
+        font-size: 1.1em;
+        font-weight: bold;
+        border: none !important;
+    }
+
+    .form-control:focus {
+        border-color: #3c8dbc;
+        box-shadow: 0 0 0 0.2rem rgba(60, 141, 188, 0.25);
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon .form-control {
+        padding-left: 40px;
+    }
+
+    .input-icon .icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 3;
+    }
+
+    .action-buttons {
+        text-align: center;
+        padding: 20px 0;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .highlight {
+        animation: pulse 0.5s ease-in-out;
+        background-color: rgba(40, 167, 69, 0.2) !important;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .badge {
+        font-size: 0.85em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(60, 141, 188, 0.1);
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85em;
+        letter-spacing: 0.5px;
+    }
 </style>
 {% endblock %}
 
 {% block contenido %}
-<div class="container">
-    <h1>Registrar Venta</h1>
-    <div class="alert alert-danger hidden" role="alert" id="error-message"></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-cash-register text-primary"></i> 
+                Registrar Nueva Venta
+            </h1>
+        </div>
+    </div>
+
+    <div class="alert alert-danger d-none" role="alert" id="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span id="error-text"></span>
+    </div>
+
     <form method="post" id="venta-form">
         {% csrf_token %}
 
-        <div class="row mb-3">
-            <div class="col-md-1">
-                <label>Fecha</label>
-            </div>
-            <div class="col-md-2">
-                {{ form.fecha_venta }}
-            </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-1">
-                <label>Tipo</label>
-            </div>
-            <div class="col-md-2">
-            {{ form.tipo }}
-            </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-1">
-                <label>No Doc.</label>
-            </div>
-            <div class="col-md-3">
-                {{ form.nrodoc }}
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-1">
-                <label>Cliente</label>
-            </div>
-            <div class="col-md-7">
-                <select name="cliente" id="idcliente" class="form-control selectpicker" data-live-search="true" onchange="mostrarCliente()" required>
-                    <option value="">-- Seleccione Cliente --</option>
-                    {% for c in clientes %}
-                        <option value="{{ c.idcliente }}">
-                        {{ c.apellido }} {{ c.nombre }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-1">
-                <label>RUC/DNI</label>
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="ruc" id="ruc" readonly>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-1">
-                <label>Dirección</label>
-            </div>
-            <div class="col-md-11">
-                <input type="text" class="form-control" name="direccion" id="direccion" readonly>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-1">
-                <label>Producto</label>
-            </div>
-            <div class="col-md-6">
-                <select class="form-control selectpicker" id="idproducto" data-live-search="true">
-                    <option value="0">- Seleccione Producto -</option>
-                    {% for producto in productos %}
-                    <option value="{{ producto.idproducto }}">{{ producto.descripcion }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-1 text-right">
-                <label>Unidad:</label>
-            </div>
-            <div class="col-md-3">
-                <input type="text" class="form-control" name="unidad" id="unidad" readonly>
-                <input type="hidden" name="stock" id="stock">
-            </div>
-        </div>
-
-        <!-- Nueva fila para mostrar el stock -->
-        <div class="row mb-3">
-            <div class="col-md-1"></div>
-            <div class="col-md-6">
-                <div id="stock-display" class="stock-info" style="display: none;">
-                    <i class="fas fa-boxes"></i> 
-                    <strong>Stock disponible:</strong> 
-                    <span id="stock-cantidad">0</span> unidades
-                    <div id="stock-warning" style="display: none; margin-top: 5px;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <small id="stock-message"></small>
+        <!-- Información General -->
+        <div class="form-section">
+            <h4 class="section-header">
+                <i class="fas fa-info-circle"></i>
+                Información General
+            </h4>
+            
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="fas fa-calendar-alt text-primary"></i> Fecha
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-calendar icon"></i>
+                        {{ form.fecha_venta }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="fas fa-file-alt text-success"></i> Tipo Documento
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-file icon"></i>
+                        {{ form.tipo }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="fas fa-hashtag text-info"></i> No. Documento
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-hashtag icon"></i>
+                        {{ form.nrodoc }}
                     </div>
                 </div>
             </div>
-            <div class="col-md-5"></div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-md-1"></div>
-            <div class="col-md-1">
-                <label>Precio</label>
+        <!-- Información del Cliente -->
+        <div class="form-section">
+            <h4 class="section-header">
+                <i class="fas fa-user-tie"></i>
+                Información del Cliente
+            </h4>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <i class="fas fa-user text-primary"></i> Cliente
+                    </label>
+                    <select name="cliente" id="idcliente" class="form-control selectpicker" data-live-search="true" onchange="mostrarCliente()" required>
+                        <option value="">-- Seleccione Cliente --</option>
+                        {% for c in clientes %}
+                            <option value="{{ c.idcliente }}">
+                            {{ c.apellido }} {{ c.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <i class="fas fa-id-card text-info"></i> RUC/DNI
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-id-card icon"></i>
+                        <input type="text" class="form-control" name="ruc" id="ruc" readonly>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <input type="number" step="0.01" class="form-control" name="precio" id="precio">
-            </div>
-            <div class="col-md-1">
-                <label>Cantidad</label>
-            </div>
-            <div class="col-md-2">
-                <input type="number" class="form-control" name="cantidad" id="cantidad">
-            </div>
-            <div class="col-md-3">
-                <button type="button" id="btnadddet" class="btn btn-success">
-                    <i class="fas fa-shopping-cart"></i> Agregar al carrito
-                </button>
+
+            <div class="row mb-3">
+                <div class="col-md-9">
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt text-danger"></i> Dirección
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-map-marker-alt icon"></i>
+                        <input type="text" class="form-control" name="direccion" id="direccion" readonly>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-12 mb-3">
+        <!-- Selección de Productos -->
+        <div class="form-section">
+            <h4 class="section-header">
+                <i class="fas fa-box-open"></i>
+                Selección de Productos
+            </h4>
+
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <label class="form-label">
+                        <i class="fas fa-cube text-primary"></i> Producto
+                    </label>
+                    <select class="form-control selectpicker" id="idproducto" data-live-search="true">
+                        <option value="0">- Seleccione Producto -</option>
+                        {% for producto in productos %}
+                        <option value="{{ producto.idproducto }}">{{ producto.descripcion }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-ruler text-info"></i> Unidad
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-ruler icon"></i>
+                        <input type="text" class="form-control" name="unidad" id="unidad" readonly>
+                        <input type="hidden" name="stock" id="stock">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-dollar-sign text-success"></i> Precio
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-dollar-sign icon"></i>
+                        <input type="number" step="0.01" class="form-control" name="precio" id="precio">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">
+                        <i class="fas fa-sort-numeric-up text-warning"></i> Cantidad
+                    </label>
+                    <div class="input-icon">
+                        <i class="fas fa-sort-numeric-up icon"></i>
+                        <input type="number" class="form-control" name="cantidad" id="cantidad">
+                    </div>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" id="btnadddet" class="btn btn-success btn-action">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stock Display -->
+            <div class="row">
+                <div class="col-md-5">
+                    <div id="stock-display" class="stock-info" style="display: none;">
+                        <i class="fas fa-boxes"></i> 
+                        <strong>Stock disponible:</strong> 
+                        <span id="stock-cantidad">0</span> unidades
+                        <div id="stock-warning" style="display: none; margin-top: 5px;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <small id="stock-message"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles de Venta -->
+        <div class="form-section">
+            <h4 class="section-header">
+                <i class="fas fa-list-alt"></i>
+                Detalles de la Venta
+            </h4>
+
             <div class="table-responsive">
                 <table id="detalles" class="table table-striped table-bordered table-hover">
                     <thead class="thead-default">
                         <tr>
-                            <th width="10" class="text-center">OPCIONES</th>
-                            <th class="text-center">CODIGO</th>
-                            <th>DESCRIPCIÓN</th>
-                            <th>UNIDAD</th>
-                            <th class="text-center">CANTIDAD</th>
-                            <th class="text-center">P.VENTA</th>
-                            <th>IMPORTE</th>
+                            <th width="10" class="text-center">
+                                <i class="fas fa-cog"></i> OPCIONES
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-barcode"></i> CÓDIGO
+                            </th>
+                            <th>
+                                <i class="fas fa-tag"></i> DESCRIPCIÓN
+                            </th>
+                            <th>
+                                <i class="fas fa-ruler"></i> UNIDAD
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-sort-numeric-up"></i> CANTIDAD
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-dollar-sign"></i> P.VENTA
+                            </th>
+                            <th>
+                                <i class="fas fa-calculator"></i> IMPORTE
+                            </th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -188,22 +416,45 @@
             </div>
         </div>
 
-        <div class="row mb-3">
+        <!-- Cálculos y Total -->
+        <div class="row">
             <div class="col-md-8"></div>
-            <div class="col-md-2 text-right">
-                <label>Total:</label>
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control text-right" name="total" id="total" readonly>
+            <div class="col-md-4">
+                <div class="calculation-panel">
+                    <div class="calculation-row">
+                        <div class="calculation-label">
+                            <i class="fas fa-calculator text-info"></i>
+                            <span>Subtotal:</span>
+                        </div>
+                        <input type="text" class="form-control calculation-input" id="subtotal_display" readonly value="0.00">
+                    </div>
+                    
+                    <div class="calculation-row">
+                        <div class="calculation-label">
+                            <i class="fas fa-percent text-warning"></i>
+                            <span>IGV (18%):</span>
+                        </div>
+                        <input type="text" class="form-control calculation-input" id="igv_display" readonly value="0.00">
+                    </div>
+                    
+                    <div class="calculation-row">
+                        <div class="calculation-label">
+                            <i class="fas fa-coins text-success"></i>
+                            <span>Total:</span>
+                        </div>
+                        <input type="text" class="form-control calculation-input total-input" name="total" id="total" readonly value="0.00">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary" id="btnRegistrar">
-                <i class="fas fa-save"></i> Registrar
+        <!-- Botones de Acción -->
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-primary btn-action" id="btnRegistrar">
+                <i class="fas fa-save"></i> Registrar Venta
             </button>
-            <a href="{% url 'listar_ventas' %}" class="btn btn-danger">
-                <i class="fas fa-ban"></i> Cancelar
+            <a href="{% url 'listar_ventas' %}" class="btn btn-danger btn-action">
+                <i class="fas fa-times"></i> Cancelar
             </a>
         </div>
     </form>

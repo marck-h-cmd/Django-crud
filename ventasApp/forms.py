@@ -21,7 +21,7 @@ class ProductoForm(forms.ModelForm):
         class Meta:   
                 model=Producto         
     
-                fields=['descripcion','idcategoria','precio','stock']
+                fields=['descripcion','idcategoria','precio','stock','idunidad']
         
         def __init__(self, *args, **kwargs):
                 super().__init__(*args, **kwargs)
@@ -30,6 +30,12 @@ class ProductoForm(forms.ModelForm):
                 self.fields['idcategoria'].label_from_instance = lambda obj: f"{obj.descripcion}"
                 self.fields['idcategoria'].empty_label = "-- Selecciona una categoría --"
                 self.fields['idcategoria'].help_text = "Elige la categoría del producto"
+                
+                self.fields['idunidad'].queryset = Unidad.objects.filter(estado=True)
+                self.fields['idunidad'].label = "Unidad"
+                self.fields['idunidad'].label_from_instance = lambda obj: f"{obj.descripcion}"
+                self.fields['idunidad'].empty_label = "-- Selecciona una unidad --"
+                self.fields['idunidad'].help_text = "Elige la unidad del producto"
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
