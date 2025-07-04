@@ -2,3 +2,4 @@ PyMySQL
 crispy-bootstrap4
 django-crispy-forms
 python-dotenv 
+gunicorn
