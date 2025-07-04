@@ -30,6 +30,14 @@ SECRET_KEY = 'django-insecure-&s8*s+swbm(7e+em-uo77u3@-drfjk1ouvex*)i5=xn-7ku7ys
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+EXTERNAL_HOSTNAME = os.environ.get('EXTERNAL_HOSTNAME')
+if EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(EXTERNAL_HOSTNAME)
+
+# Development defaults
+ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+
 MESSAGE_TAGS={
 message_constants.DEBUG:'debug',
 message_constants.INFO:'info',
