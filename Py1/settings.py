@@ -144,10 +144,20 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'Py1/static'),
-    os.path.join(BASE_DIR, 'gestionVentas/static'),] 
+    os.path.join(BASE_DIR, 'Py1/static'),
+    os.path.join(BASE_DIR, 'gestionVentas/static'),
+    os.path.join(BASE_DIR, 'seguridadApp/static'),  
+    os.path.join(BASE_DIR, 'ventasApp/static'),     
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACK="bootstrap4"
